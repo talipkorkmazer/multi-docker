@@ -1,0 +1,36 @@
+sudo: required
+services:
+  - docker
+
+before_install:
+  - docker build -t tkorkmazer/react-test -f Dockerfile.dev .
+
+script:
+  - docker run -e CI=true tkorkmazer/react-test npm run test
+
+after_success:
+  - docker build -t tkorkmazer/multi-client ./client
+  - docker build -t tkorkmazer/multi-nginx ./nginx
+  - docker build -t tkorkmazer/multi-server ./server
+  - docker build -t tkorkmazer/multi-worker ./worker
+  # Log in the docker CLI
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+  # Take those images and push them to docker hub
+  - docker push tkorkmazer/multi-client
+  - docker push tkorkmazer/multi-nginx
+  - docker push tkorkmazer/multi-server
+  - docker push tkorkmazer/multi-worker
+
+language: generic
+
+deploy:
+  provider: elasticbeanstalk
+  region: "eu-central-1"
+  app: "docker-react"
+  env: "Dockerreact-env-1"
+  bucket_name: "elasticbeanstalk-eu-central-1-631209419881"
+  bucket_path: "docker-react"
+  on:
+    branch: master
+  access_key_id: $AWS_ACCESS_KEY
+  secret_access_key: $AWS_SECRET_KEY
