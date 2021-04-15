@@ -16,9 +16,9 @@ after_success:
   # Log in the docker CLI
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
   # Take those images and push them to docker hub
-  - docker push tkorkmazer/multi-client
-  - docker push tkorkmazer/multi-nginx
-  - docker push tkorkmazer/multi-server
-  - docker push tkorkmazer/multi-worker
+  - docker push talipcank/multi-client
+  - docker push talipcank/multi-nginx
+  - docker push talipcank/multi-server
+  - docker push talipcank/multi-worker
 
 language: generic
